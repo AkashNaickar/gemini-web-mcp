@@ -1,0 +1,8 @@
+node_modules/
+dist/
+.user-data-dir/
+.session.json
+.env
+*.log
+*.png
+*.tgz
