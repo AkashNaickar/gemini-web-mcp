@@ -1,0 +1,57 @@
+{
+  "name": "gemini-website-mcp",
+  "version": "1.0.1",
+  "description": "Open-source Model Context Protocol (MCP) Server & CLI Bridge for Google Gemini Web (gemini.google.com)",
+  "main": "dist/cli.js",
+  "bin": {
+    "gemini-website-mcp": "dist/cli.js",
+    "gemini-web-mcp": "dist/cli.js"
+  },
+  "type": "module",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "CONTRIBUTING.md"
+  ],
+  "scripts": {
+    "login": "tsx src/cli.ts login",
+    "test:prompt": "tsx src/cli.ts ask",
+    "chat": "tsx src/cli.ts chat",
+    "link": "tsx src/cli.ts link",
+    "open": "tsx src/cli.ts open",
+    "status": "tsx src/cli.ts status",
+    "build": "tsc",
+    "start": "node dist/cli.js",
+    "dev": "tsx src/cli.ts",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "gemini",
+    "mcp",
+    "model-context-protocol",
+    "playwright",
+    "gemini-advanced",
+    "browser-automation",
+    "ai-agent",
+    "claude-desktop",
+    "antigravity",
+    "cursor-mcp"
+  ],
+  "author": "Akash Naickar",
+  "license": "MIT",
+  "preferGlobal": true,
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.6.1",
+    "dotenv": "^16.4.7",
+    "playwright": "^1.50.1",
+    "turndown": "^7.2.0",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.4",
+    "@types/turndown": "^5.0.5",
+    "tsx": "^4.19.3",
+    "typescript": "^5.7.3"
+  }
+}

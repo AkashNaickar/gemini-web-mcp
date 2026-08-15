@@ -1,0 +1,8 @@
+src/
+.user-data-dir/
+.session.json
+.env
+.env.example
+*.log
+*.png
+tsconfig.json
