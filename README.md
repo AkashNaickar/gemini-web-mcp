@@ -3,14 +3,10 @@
 Use your actual Google Gemini web session inside AI coding agents and your terminal.
 
 ```
-       _                     _            _               _ _                                
-      (_)                   (_)          | |             (_) |                               
-  __ _ _ _ __ ___   ___ _ __  ___      _____ | |__  ___ _ _   _| |_ ___       _ __ ___   ___ _ __  
- / _` | | '_ ` _ \ / _ \ '_ \| \ \ /\ / / _ \| '_ \/ __| | | | | __/ _ \     | '_ ` _ \ / __| '_ \ 
-| (_| | | | | | | |  __/ | | | |\ V  V /  __/| |_) \__ \ | |_| | ||  __/  _  | | | | | | (__| |_) |
- \__, |_|_| |_| |_|\___|_| |_|_| \_/\_/ \___||_.__/|___/_|\__,_|\__\___| (_) |_| |_| |_|\___| .__/ 
-  __/ |                                                                                      | |    
- |___/                                                                                       |_|    
+   ___ ___ __  __ ___ _  _ ___   __      _____ ___   __  __  ___ ___ 
+  / __| __|  \/  |_ _| \| |_ _|  \ \    / / __| _ ) |  \/  |/ __| _ \
+ | (_ | _|| |\/| || || .` || |    \ \/\/ /| _|| _ \ | |\/| | (__|  _/
+  \___|___|_|  |_|___|_|\_|___|    \_/\_/ |___|___/ |_|  |_|\___|_|  
 ```
 
 [![npm version](https://img.shields.io/npm/v/gemini-website-mcp.svg?color=cb3837)](https://www.npmjs.com/package/gemini-website-mcp)
@@ -168,7 +164,7 @@ CHROME_EXECUTABLE_PATH=
 
 ```bash
 git clone https://github.com/akashnaickar/gemini-website-mcp.git
-cd gemini-website-mcp
+cd gemini-web-mcp
 npm install
 npx playwright install chromium
 npm run build
