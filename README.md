@@ -233,7 +233,7 @@ echo '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":
 
 ## Contributing
 
-Contributions are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md); keep TypeScript building clean (`npm run typecheck`) and tests green (`npm test`) before opening a PR.
+Contributions are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md); keep TypeScript building clean (`npm run typecheck`) and tests green (`npm test`) before opening a PR. This project follows the [Contributor Covenant Code of Conduct](CODE_OF_CONDUCT.md). To report a vulnerability, use the private process in [SECURITY.md](SECURITY.md) instead of a public issue.
 
 ## License
 
