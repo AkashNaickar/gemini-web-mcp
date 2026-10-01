@@ -1,18 +1,8 @@
 import readline from 'node:readline';
-import { exec } from 'node:child_process';
 import { GeminiDriver } from './gemini-driver.js';
 import { loadSession, saveSession } from './session.js';
-
-export function openUrlInBrowser(url: string): void {
-  const startCmd =
-    process.platform === 'win32'
-      ? `start "" "${url}"`
-      : process.platform === 'darwin'
-      ? `open "${url}"`
-      : `xdg-open "${url}"`;
-
-  exec(startCmd);
-}
+import { openUrlInBrowser } from './open-url.js';
+import { parsePromptArgs } from './args.js';
 
 function createReadline(): readline.Interface {
   return readline.createInterface({
@@ -126,8 +116,10 @@ export async function runInteractiveChat(driver: GeminiDriver): Promise<void> {
  * Single-shot command line runner that maintains persistent conversation history
  */
 export async function runSingleCommand(args: string[], driver: GeminiDriver): Promise<void> {
+  const { link, open, isNewChat: isNewChatFlag, prompt } = parsePromptArgs(args);
+
   // Check for standalone link / open commands
-  if (args.includes('--link') || args.includes('-l') || args.includes('/link') || args.includes('/url')) {
+  if (link) {
     const session = loadSession();
     if (session.lastChatUrl) {
       console.log(`\n🔗 Current Active Chat Link: ${session.lastChatUrl}\n`);
@@ -137,7 +129,7 @@ export async function runSingleCommand(args: string[], driver: GeminiDriver): Pr
     process.exit(0);
   }
 
-  if (args.includes('--open') || args.includes('/open')) {
+  if (open) {
     const session = loadSession();
     if (session.lastChatUrl) {
       console.log(`\n🌐 Opening in browser: ${session.lastChatUrl}\n`);
@@ -147,10 +139,6 @@ export async function runSingleCommand(args: string[], driver: GeminiDriver): Pr
     }
     process.exit(0);
   }
-
-  const isNewChatFlag = args.includes('--new') || args.includes('-n');
-  const cleanArgs = args.filter((a) => a !== '--new' && a !== '-n');
-  const prompt = cleanArgs.join(' ');
 
   console.log('='.repeat(65));
   console.log('🤖 Gemini Web Driver - CLI Test Runner');
