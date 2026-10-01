@@ -1,11 +1,12 @@
 #!/usr/bin/env node
-import { runInteractiveChat, runSingleCommand, openUrlInBrowser } from './test-cli.js';
+import { runInteractiveChat, runSingleCommand } from './test-cli.js';
 import { runLogin } from './login.js';
 import { GeminiDriver } from './gemini-driver.js';
 import { loadSession } from './session.js';
 import { startMcpServer } from './mcp-server.js';
-
-const VERSION = '1.0.0';
+import { openUrlInBrowser } from './open-url.js';
+import { parseCliArgs } from './args.js';
+import { VERSION } from './version.js';
 
 function printHelp(): void {
   console.log(`
@@ -45,87 +46,88 @@ MCP AGENT CONFIG (e.g. Claude Desktop / Antigravity):
 }
 
 async function main(): Promise<void> {
-  const args = process.argv.slice(2);
-  const command = args[0]?.toLowerCase();
+  const command = parseCliArgs(process.argv.slice(2));
 
-  // 1. If called without args or with mcp flag in a non-TTY/piped environment, run MCP server
-  if (!command || command === 'mcp' || command === '--stdio') {
-    // If standard input is not a TTY or no command given, launch MCP server
-    await startMcpServer();
-    return;
-  }
+  switch (command.kind) {
+    case 'mcp':
+      await startMcpServer();
+      return;
 
-  // 2. CLI Helper Commands
-  if (command === 'help' || command === '--help' || command === '-h') {
-    printHelp();
-    process.exit(0);
-  }
+    case 'help':
+      printHelp();
+      process.exit(0);
+      break;
 
-  if (command === '--version' || command === '-v' || command === 'version') {
-    console.log(`gemini-web-mcp v${VERSION}`);
-    process.exit(0);
-  }
+    case 'version':
+      console.log(`gemini-web-mcp v${VERSION}`);
+      process.exit(0);
+      break;
 
-  if (command === 'login' || command === 'auth') {
-    await runLogin();
-    return;
-  }
+    case 'login':
+      await runLogin();
+      return;
 
-  if (command === 'chat' || command === 'interactive' || command === 'repl') {
-    const driver = new GeminiDriver();
-    await runInteractiveChat(driver);
-    return;
-  }
-
-  if (command === 'link' || command === 'url') {
-    const session = loadSession();
-    if (session.lastChatUrl) {
-      console.log(`\n🔗 Current Active Chat Link: ${session.lastChatUrl}\n`);
-    } else {
-      console.log('\nℹ️ No active chat thread found. Run a prompt first.\n');
+    case 'chat': {
+      const driver = new GeminiDriver();
+      await runInteractiveChat(driver);
+      return;
     }
-    process.exit(0);
-  }
 
-  if (command === 'open') {
-    const session = loadSession();
-    if (session.lastChatUrl) {
-      console.log(`\n🌐 Opening in browser: ${session.lastChatUrl}\n`);
-      openUrlInBrowser(session.lastChatUrl);
-    } else {
-      console.log('\nℹ️ No active chat thread found to open.\n');
+    case 'link': {
+      const session = loadSession();
+      if (session.lastChatUrl) {
+        console.log(`\n🔗 Current Active Chat Link: ${session.lastChatUrl}\n`);
+      } else {
+        console.log('\nℹ️ No active chat thread found. Run a prompt first.\n');
+      }
+      process.exit(0);
+      break;
     }
-    process.exit(0);
-  }
 
-  if (command === 'status' || command === 'check') {
-    const driver = new GeminiDriver();
-    console.log('Checking Google session status on gemini.google.com...');
-    const status = await driver.checkAuthStatus({ headless: true, navigate: true });
-    await driver.close();
-
-    if (status.isLoggedIn) {
-      console.log('\n✅ Authenticated: Session is active and ready.');
-    } else {
-      console.log('\n❌ Unauthenticated: Please run `gemini-web-mcp login` to sign in.');
+    case 'open': {
+      const session = loadSession();
+      if (session.lastChatUrl) {
+        console.log(`\n🌐 Opening in browser: ${session.lastChatUrl}\n`);
+        openUrlInBrowser(session.lastChatUrl);
+      } else {
+        console.log('\nℹ️ No active chat thread found to open.\n');
+      }
+      process.exit(0);
+      break;
     }
-    process.exit(0);
-  }
 
-  if (command === 'ask') {
-    const promptArgs = args.slice(1);
-    if (promptArgs.length === 0) {
-      console.error('Error: Please provide a prompt. Example: gemini-web-mcp ask "Hello"');
-      process.exit(1);
+    case 'status': {
+      const driver = new GeminiDriver();
+      console.log('Checking Google session status on gemini.google.com...');
+      const status = await driver.checkAuthStatus({ headless: true, navigate: true });
+      await driver.close();
+
+      if (status.isLoggedIn) {
+        console.log('\n✅ Authenticated: Session is active and ready.');
+      } else {
+        console.log('\n❌ Unauthenticated: Please run `gemini-web-mcp login` to sign in.');
+      }
+      process.exit(0);
+      break;
     }
-    const driver = new GeminiDriver();
-    await runSingleCommand(promptArgs, driver);
-    return;
-  }
 
-  // Fallback: treat unknown args as a direct prompt
-  const driver = new GeminiDriver();
-  await runSingleCommand(args, driver);
+    case 'ask': {
+      if (command.args.length === 0) {
+        console.error('Error: Please provide a prompt. Example: gemini-web-mcp ask "Hello"');
+        process.exit(1);
+      }
+      const driver = new GeminiDriver();
+      await runSingleCommand(command.args, driver);
+      return;
+    }
+
+    case 'prompt': {
+      // Fallback: treat unknown args as a direct prompt.
+      const driver = new GeminiDriver();
+      await runSingleCommand(command.args, driver);
+      return;
+    }
+  }
 }
 
 main().catch((err) => {

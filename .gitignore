@@ -2,7 +2,8 @@ node_modules/
 dist/
 .user-data-dir/
 .session.json
+session.json
 .env
 *.log
-*.png
+scratch_*.png
 *.tgz

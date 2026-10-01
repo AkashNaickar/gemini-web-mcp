@@ -1,64 +1,79 @@
-# gemini-website-mcp
+# Gemini Web MCP
 
-Use your actual Google Gemini web session inside AI coding agents and your terminal.
-
-```
-   ___ ___ __  __ ___ _  _ ___   __      _____ ___   __  __  ___ ___ 
-  / __| __|  \/  |_ _| \| |_ _|  \ \    / / __| _ ) |  \/  |/ __| _ \
- | (_ | _|| |\/| || || .` || |    \ \/\/ /| _|| _ \ | |\/| | (__|  _/
-  \___|___|_|  |_|___|_|\_|___|    \_/\_/ |___|___/ |_|  |_|\___|_|  
-```
+Use your real Google Gemini web session inside AI coding agents and your terminal.
 
 [![npm version](https://img.shields.io/npm/v/gemini-website-mcp.svg?color=cb3837)](https://www.npmjs.com/package/gemini-website-mcp)
+[![CI](https://github.com/AkashNaickar/gemini-web-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/AkashNaickar/gemini-web-mcp/actions/workflows/ci.yml)
+[![gitleaks](https://github.com/AkashNaickar/gemini-web-mcp/actions/workflows/gitleaks.yml/badge.svg)](https://github.com/AkashNaickar/gemini-web-mcp/actions/workflows/gitleaks.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Node](https://img.shields.io/badge/node-%3E%3D18-brightgreen.svg)](package.json)
 
-Most Gemini API wrappers require credit cards, paid API keys, or deal with restricted model tiers that strip out web grounding, Canvas, code execution, and Workspace integrations.
+Most Gemini wrappers require credit cards or paid API keys and often deal with restricted model tiers that strip out web grounding, Canvas, code execution, and Workspace integrations.
 
-`gemini-website-mcp` bridges your AI coding assistants (Claude Desktop, Cursor, Antigravity, Windsurf) directly to the real `gemini.google.com` interface using your existing Google account.
+`gemini-web-mcp` bridges your AI coding assistants (Claude Desktop, Cursor, Windsurf, Antigravity) and your terminal directly to the real `gemini.google.com` interface using your existing Google account.
+
+> **No hosted demo.** This project is a local CLI + stdio MCP server; there is no web UI or public URL to click. The closest equivalent to a demo is the install command:
+>
+> ```bash
+> npx -y gemini-website-mcp login
+> npx -y gemini-website-mcp chat
+> ```
+
+---
+
+## Contents
+
+- [What it does](#what-it-does)
+- [Quick start](#quick-start)
+- [Hooking into AI coding agents](#hooking-into-ai-coding-agents)
+- [CLI commands](#cli-commands)
+- [Available MCP tools](#available-mcp-tools)
+- [How it works](#how-it-works)
+- [Environment variables](#environment-variables)
+- [Development](#development)
+- [Testing](#testing)
+- [Roadmap](#roadmap)
+- [Contributing](#contributing)
+- [License](#license)
 
 ---
 
 ## What it does
 
-- **Direct Web Access**: Lets your coding agent leverage live Google Search grounding, Python code runners, and document upload features available on the web UI.
-- **Zero API Key Hassle**: Authenticate once in a real browser window. Your session cookies stay on your local disk.
-- **Thread Memory**: Keeps conversation context across multiple turns automatically.
-- **Works via npx**: No need to clone the repo or build binaries.
-- **Built on open MCP standards**: Connects to any Model Context Protocol client over standard IO.
+- **Direct web access**: lets your agent use live Google Search grounding, the Python code runner, and document upload features from the real web UI.
+- **No API key handling**: authenticate once in a real browser window; the session cookies stay on your own disk.
+- **Thread memory**: keeps conversation context across turns via a local session file.
+- **Works via `npx`**: no need to clone the repo or build anything.
+- **Open MCP standard**: connects to any Model Context Protocol client over stdio.
 
----
-
-## 30-Second Quickstart
+## Quick start
 
 ### 1. Log in once
-Open a terminal and run:
 
 ```bash
 npx -y gemini-website-mcp login
 ```
 
-A Chrome window pops up. Sign into your Google account (including 2FA if you have it enabled). Once you see the Gemini chat box, switch back to the terminal and press `Enter`. Your session is saved locally in `~/.gemini-web-mcp/`.
+A Chrome window opens. Sign into your Google account (including 2FA if enabled). Once the Gemini chat box is visible, return to the terminal and press `Enter`. The session is saved locally under `~/.gemini-web-mcp/` (override with `USER_DATA_DIR`).
 
 ### 2. Chat from your terminal
-Try asking a question right away:
 
 ```bash
 npx -y gemini-website-mcp chat
 ```
 
-Or shoot a one-off prompt:
+Or send a one-off prompt that continues the previous thread:
 
 ```bash
-npx -y gemini-website-mcp ask "Find the latest benchmarks for DeepSeek R1 and summarize them"
+npx -y gemini-website-mcp ask "Summarize the latest Gemini release notes"
 ```
 
----
-
-## Hooking into AI Coding Agents
+## Hooking into AI coding agents
 
 Add the server to your agent's MCP config file.
 
 ### Antigravity (`~/.gemini/config/mcp_config.json`)
+
 ```json
 {
   "mcpServers": {
@@ -70,6 +85,7 @@ Add the server to your agent's MCP config file.
 ```
 
 ### Claude Desktop (`claude_desktop_config.json`)
+
 - **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
 - **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
 
@@ -85,6 +101,7 @@ Add the server to your agent's MCP config file.
 ```
 
 ### Cursor (`.cursor/mcp.json`)
+
 ```json
 {
   "mcpServers": {
@@ -96,83 +113,128 @@ Add the server to your agent's MCP config file.
 }
 ```
 
----
+## CLI commands
 
-## CLI Commands
+Both `gemini-web-mcp` and the longer `gemini-website-mcp` are installed as binaries and behave identically.
 
 | Command | Description |
 | :--- | :--- |
-| `gemini-website-mcp login` | Opens browser for one-time Google login |
-| `gemini-website-mcp chat` | Starts real-time multi-turn terminal chat REPL |
-| `gemini-website-mcp ask "<prompt>"` | Asks a question, continuing the last conversation |
-| `gemini-website-mcp ask --new "<prompt>"` | Starts a fresh conversation thread |
-| `gemini-website-mcp link` | Prints the web link for the active thread |
-| `gemini-website-mcp open` | Opens the current thread in your default browser |
-| `gemini-website-mcp status` | Verifies your session auth status |
+| `gemini-web-mcp login` | Opens a browser for one-time Google login |
+| `gemini-web-mcp chat` | Starts the real-time multi-turn terminal chat REPL |
+| `gemini-web-mcp ask "<prompt>"` | Asks a question, continuing the last conversation |
+| `gemini-web-mcp ask --new "<prompt>"` | Starts a fresh conversation thread |
+| `gemini-web-mcp link` | Prints the web link for the active thread |
+| `gemini-web-mcp open` | Opens the current thread in your default browser |
+| `gemini-web-mcp status` | Verifies your session auth status |
+| `gemini-web-mcp --version` | Prints the installed version |
+| `gemini-web-mcp` (no args) | Starts the MCP server on stdio |
 
----
+## Available MCP tools
 
-## Available MCP Tools
+When an agent connects to the MCP server it gets these tools:
 
-When your agent connects to the MCP server, it gets access to these tools:
+1. **`ask_gemini_web`** — sends a prompt to Gemini web, waits for streaming to finish, and returns clean Markdown.
+   - `prompt` (string, required): the prompt text.
+   - `new_chat` (boolean, optional): set `true` to force a new thread. Defaults to `false`.
+   - `timeout_seconds` (number, optional): max wait time. Defaults to `60`.
+2. **`gemini_upload_and_analyze`** — uploads a local file or image to Gemini for multimodal review.
+   - `prompt` (string, required): instructions for analyzing the file.
+   - `file_path` (string, required): path to the image or document.
+   - `new_chat` (boolean, optional): defaults to `true`.
+3. **`get_current_chat_url`** — returns the direct URL to the active conversation on `gemini.google.com`.
+4. **`check_gemini_session_status`** — checks whether the local Google login is active.
 
-1. `ask_gemini_web`: Sends a prompt to Gemini web, waits for response streaming, and returns clean Markdown.
-   - `prompt` (string, required): The prompt text.
-   - `new_chat` (boolean, optional): Set to `true` to force a new thread.
-   - `timeout_seconds` (number, optional): Max wait time (default: 60).
+## How it works
 
-2. `gemini_upload_and_analyze`: Uploads a local file or image to Gemini web for multimodal review.
-   - `prompt` (string, required): Instructions for analyzing the file.
-   - `file_path` (string, required): Path to the image or document.
+```mermaid
+flowchart LR
+  subgraph Clients
+    CD[Claude Desktop]
+    CU[Cursor / Windsurf]
+    AG[Antigravity]
+    TM[Terminal]
+  end
 
-3. `get_current_chat_url`: Returns the direct URL to the conversation on `gemini.google.com`.
+  CD -->|stdio JSON-RPC| MCP[MCP Server]
+  CU -->|stdio JSON-RPC| MCP
+  AG -->|stdio JSON-RPC| MCP
+  MCP --> DRV[GeminiDriver]
+  TM -->|CLI args| CLI[CLI Router]
+  CLI --> DRV
 
-4. `check_gemini_session_status`: Checks if your local Google login is active.
+  DRV -->|Playwright| BR[Persistent Chrome profile]
+  BR -->|HTTPS| GW[gemini.google.com]
+  DRV -->|Turndown| MD[Markdown response]
 
----
-
-## How It Works
-
-1. **Persistent Browser Session**: Playwright spins up a background browser instance pointing to a persistent user profile directory (`~/.gemini-web-mcp/profile`).
-2. **Stealth Flags**: Runs with anti-automation flags and proper user-agent headers so Google does not flag headless sessions.
-3. **DOM Stream Observer**: Watches the response container and detects when the stop/streaming indicators disappear, instantly converting the rendered HTML into GitHub-flavored Markdown via Turndown.
-4. **Zero Cloud Leaks**: Your login cookies and conversation history never leave your own machine.
-
----
-
-## Environment Configuration
-
-Optional overrides via environment variables or a local `.env` file:
-
-```ini
-# Path to store cookies and profile data (default: ~/.gemini-web-mcp/profile)
-USER_DATA_DIR=~/.gemini-web-mcp/profile
-
-# Show the browser window while executing (true/false, default: true)
-HEADLESS=true
-
-# Request timeout in milliseconds (default: 60000)
-TIMEOUT_MS=60000
-
-# Optional custom Chrome or Chromium binary path
-CHROME_EXECUTABLE_PATH=
+  MCP --> SES[(Local session store)]
+  DRV --> SES
 ```
 
----
+1. **Persistent browser session**: Playwright launches a background browser instance against a persistent profile directory (`~/.gemini-web-mcp/profile`).
+2. **Stealth flags**: runs with anti-automation flags and user-agent handling so Google is less likely to flag the session.
+3. **DOM stream observer**: watches the response container and detects when streaming stops, then converts the rendered HTML to GitHub-flavored Markdown with Turndown.
+4. **Local-only data**: login cookies and conversation history never leave your machine.
 
-## Local Development
+## Environment variables
+
+Optional overrides via environment variables or a local `.env` file (see `.env.example`):
+
+| Variable | Default | Description |
+| :--- | :--- | :--- |
+| `USER_DATA_DIR` | `~/.gemini-web-mcp/profile` | Directory for the persistent browser profile and session cookies |
+| `HEADLESS` | `true` | Run the browser headless; set to `false` to watch the window |
+| `TIMEOUT_MS` | `60000` | Navigation and response timeout in milliseconds |
+| `CHROME_EXECUTABLE_PATH` | auto-detected | Path to a custom Chrome/Chromium binary |
+| `GEMINI_BASE_URL` | `https://gemini.google.com/app` | Base Gemini URL |
+| `USER_AGENT` | browser default | Override the Playwright user agent |
+
+## Development
 
 ```bash
-git clone https://github.com/akashnaickar/gemini-website-mcp.git
+git clone https://github.com/AkashNaickar/gemini-web-mcp.git
 cd gemini-web-mcp
 npm install
 npx playwright install chromium
 npm run build
-npm link
+npm link            # optional: expose the gemini-web-mcp command locally
 ```
 
----
+Scripts:
+
+| Script | Description |
+| :--- | :--- |
+| `npm run dev` | Run the CLI directly from TypeScript via tsx |
+| `npm run build` | Compile `src/` to `dist/` with `tsc` |
+| `npm run typecheck` | Type-check `src/` and `test/` without emitting |
+| `npm test` | Run the unit test suite |
+| `npm run login` | Authenticate a Google account |
+| `npm run chat` | Start the interactive chat REPL |
+
+## Testing
+
+```bash
+npm run typecheck   # src + test
+npm test            # 31 unit tests over argv parsing, config resolution and URL handling
+```
+
+The test suite targets pure logic only (argument parsing, environment/profile resolution, and safe URL opening); anything that needs a real browser session is exercised manually via `npm run chat`.
+
+To verify the MCP stdio handshake after building:
+
+```bash
+echo '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2024-11-05","capabilities":{},"clientInfo":{"name":"test","version":"1.0.0"}}}' | npm start
+```
+
+## Roadmap
+
+- [ ] Optional response streaming events exposed over MCP.
+- [ ] Broader selector coverage for Gemini UI changes.
+- [ ] Configurable conversation history retention.
+
+## Contributing
+
+Contributions are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md); keep TypeScript building clean (`npm run typecheck`) and tests green (`npm test`) before opening a PR.
 
 ## License
 
-MIT (c) 2026 Akash Naickar
+MIT © 2026 Akash Naickar. See [LICENSE](LICENSE).

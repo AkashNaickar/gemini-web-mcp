@@ -9,6 +9,7 @@ import path from 'node:path';
 import fs from 'node:fs';
 import { GeminiDriver } from './gemini-driver.js';
 import { loadSession } from './session.js';
+import { VERSION } from './version.js';
 
 export async function startMcpServer(): Promise<void> {
   const driver = new GeminiDriver();
@@ -24,7 +25,7 @@ export async function startMcpServer(): Promise<void> {
   const server = new Server(
     {
       name: 'gemini-web-mcp',
-      version: '1.0.0',
+      version: VERSION,
     },
     {
       capabilities: {
