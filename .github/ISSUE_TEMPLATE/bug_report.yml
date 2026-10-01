@@ -1,0 +1,77 @@
+name: Bug report
+description: Report a reproducible problem with the CLI or MCP server.
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to file a bug. Please search existing issues first, and
+        **never paste session cookies, `.env` contents, or browser profile data** — redact them.
+  - type: checkboxes
+    id: preflight
+    attributes:
+      label: Preflight
+      options:
+        - label: I searched existing issues and this is not a duplicate.
+          required: true
+        - label: I reproduced this on the latest published version.
+          required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: Output of `gemini-web-mcp --version`, or the npm version you installed.
+      placeholder: "1.0.1"
+    validations:
+      required: true
+  - type: dropdown
+    id: surface
+    attributes:
+      label: Where does the problem occur?
+      options:
+        - CLI (login / chat / ask / link / open / status)
+        - MCP server (stdio, in an AI coding agent)
+        - Install / build
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: OS and version, Node version, how you installed it (npx or global), and the MCP client if relevant.
+      placeholder: |
+        Windows 11, Node 24.12.0, npx, Claude Desktop
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Run ...
+        2. ...
+        3. See error
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant logs
+      description: Paste console output only. Redact cookies, tokens, and personal data.
+      render: shell
+    validations:
+      required: false
