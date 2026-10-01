@@ -65,6 +65,6 @@
     "@types/node": "^26.6.2",
     "@types/turndown": "^5.0.5",
     "tsx": "^4.19.3",
-    "typescript": "^5.7.3"
+    "typescript": "^7.0.2"
   }
 }
