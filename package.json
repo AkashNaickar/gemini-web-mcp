@@ -22,9 +22,14 @@
     "open": "tsx src/cli.ts open",
     "status": "tsx src/cli.ts status",
     "build": "tsc",
+    "typecheck": "tsc -p tsconfig.test.json",
+    "test": "tsx --test \"test/**/*.test.ts\"",
     "start": "node dist/cli.js",
     "dev": "tsx src/cli.ts",
     "prepublishOnly": "npm run build"
+  },
+  "engines": {
+    "node": ">=18"
   },
   "keywords": [
     "gemini",
@@ -40,6 +45,14 @@
   ],
   "author": "Akash Naickar",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AkashNaickar/gemini-web-mcp.git"
+  },
+  "homepage": "https://github.com/AkashNaickar/gemini-web-mcp#readme",
+  "bugs": {
+    "url": "https://github.com/AkashNaickar/gemini-web-mcp/issues"
+  },
   "preferGlobal": true,
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.6.1",
